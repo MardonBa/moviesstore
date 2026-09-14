@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Review
+from .models import Movie, Review, ReviewReport
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.db import transaction
 
 def index(request):
     search_term = request.GET.get('search')
@@ -8,21 +10,21 @@ def index(request):
         movies = Movie.objects.filter(name__icontains=search_term)
     else:
         movies = Movie.objects.all()
+
     template_data = {}
     template_data['title'] = 'Movies'
     template_data['movies'] = movies
-    return render(request, 'movies/index.html',
-        {'template_data': template_data})
+    return render(request, 'movies/index.html', {'template_data': template_data})
 
 def show(request, id):
     movie = Movie.objects.get(id=id)
-    reviews = Review.objects.filter(movie=movie)
+    reviews = Review.objects.filter(movie=movie, is_hidden=False)
+
     template_data = {}
     template_data['title'] = movie.name
     template_data['movie'] = movie
-    template_data['rewviews'] = reviews
-    return render(request, 'movies/show.html',
-        {'template_data': template_data})
+    template_data['reviews'] = reviews
+    return render(request, 'movies/show.html', {'template_data': template_data})
 
 @login_required
 def create_review(request, id):
@@ -42,12 +44,12 @@ def edit_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id)
     if request.user != review.user:
         return redirect('movies.show', id=id)
+
     if request.method == 'GET':
         template_data = {}
         template_data['title'] = 'Edit Review'
         template_data['review'] = review
-        return render(request, 'movies/edit_review.html',
-                      {'template_data': template_data})
+        return render(request, 'movies/edit_review.html', {'template_data': template_data})
     elif request.method == 'POST' and request.POST['comment'] != '':
         review = Review.objects.get(id=review_id)
         review.comment = request.POST['comment']
@@ -56,10 +58,33 @@ def edit_review(request, id, review_id):
     else:
         return redirect('movies.show', id=id)
 
-
 @login_required
-def delete_review(request, id, review_id): 
-    review = get_object_or_404(Review, id=review_id,
-    user=request.user)
+def delete_review(request, id, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+
+@login_required
+@require_POST
+def report_review(request, id, review_id):
+    with transaction.atomic():
+        review = get_object_or_404(
+            Review,
+            id=review_id,
+            movie_id=id
+        )
+
+        if review.user == request.user:
+            return redirect('movies.show', id=id)
+
+        ReviewReport.objects.get_or_create(
+            review=review,
+            user=request.user
+        )
+
+        if review.reports.count() >= 2:
+            review.is_hidden = True
+            review.save(update_fields=['is_hidden'])
+
+        return redirect('movies.show', id=id)
