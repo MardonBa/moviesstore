@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Top Movie Purchaser</h1>
+    <p>Username: {{ top_purchaser.order__user__username }}</p>
+    <p>Movies Purchased: {{ top_purchaser.total_purchased }}</p>
+{% endblock %}
