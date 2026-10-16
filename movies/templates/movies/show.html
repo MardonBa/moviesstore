@@ -8,6 +8,17 @@
         <h2>{{ template_data.movie.name }}</h2>
         <hr />
         <p><b>Description:</b> {{ template_data.movie.description }}</p>
+        {% if template_data.averageRating == 1 %}
+        <p><b>Average rating:</b> ★☆☆☆☆</p>
+        {% elif template_data.averageRating == 2 %}
+        <p><b>Average rating:</b> ★★☆☆☆</p>
+        {% elif template_data.averageRating == 3 %}
+        <p><b>Average rating:</b> ★★★☆☆</p>
+        {% elif template_data.averageRating == 4 %}
+        <p><b>Average rating:</b> ★★★★☆</p>
+        {% elif template_data.averageRating == 5 %}
+        <p><b>Average rating:</b> ★★★★★</p>
+        {% endif %}
         <p><b>Price:</b> ${{ template_data.movie.price }}</p>
         <p class="card-text">
           <form method="post" action="{% url 'cart.add' id=template_data.movie.id %}">
@@ -37,6 +48,17 @@
             <h6 class="card-subtitle mb-2 text-muted">
               {{ review.date }}
             </h6>
+            {% if review.rating == 1 %}
+            <p class="card-text">★☆☆☆☆</p>
+            {% elif review.rating == 2 %}
+            <p class="card-text">★★☆☆☆</p>
+            {% elif review.rating == 3 %}
+            <p class="card-text">★★★☆☆</p>
+            {% elif review.rating == 4 %}
+            <p class="card-text">★★★★☆</p>
+            {% elif review.rating == 5 %}
+            <p class="card-text">★★★★★</p>
+            {% endif %}
             <p class="card-text">{{ review.comment }}</p>
             {% if user.is_authenticated and user == review.user %}
             <a class="btn btn-primary"
@@ -72,9 +94,15 @@
                   <b class="text-start">Create a review</b><br /><br />
                   <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
                     {% csrf_token %}
+                    
+                    <p>
+                      <label for="rating">Rating:</label>
+                      <input name="rating" type="range" class="form-range" min="1" max="5" step="1" value="3" id="rating">
+                    </p>
+
                     <p>
                       <label for="comment">Comment:</label>
-                      <textarea name="comment" required class="form-control" id="comment"></textarea>
+                      <textarea name="comment" class="form-control" id="comment"></textarea>
                     </p>
 
                     <div class="text-center">
@@ -82,6 +110,7 @@
                         Add Review
                       </button>
                     </div>
+                    
                   </form>
                 </div>
               </div>
