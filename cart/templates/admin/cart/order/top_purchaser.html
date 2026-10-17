@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='cart' %}">Cart</a>
+    &rsaquo; <a href="{% url 'admin:cart_order_changelist' %}">Orders</a>
+    &rsaquo; Top Movie Purchaser
+</div>
+{% endblock %}
+
+{% block content %}
+    {% if top_purchaser %}
+        <div class="module" style="max-width: 450px;">
+            <h2>Top Purchaser</h2>
+            <table style ="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Movies Purchased</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ top_purchaser.order__user__username }}</td>
+                        <td>{{ top_purchaser.total_purchased }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No movie purchases have been made yet.</p>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'admin:cart_order_changelist' %}">
+            Back to Orders
+        </a>
+    </p>
+{% endblock %}
