@@ -11,7 +11,7 @@
 {{ cities|json_script:"cities-data" }}
 
 <script>
-  mapboxgl.accessToken = "pk.eyJ1Ijoic2lyZ29uc2FsMTEiLCJhIjoiY211enBvcXFrMGRsNjJ5cHBpZ211NGZ6aCJ9.cmGkp9W8LtNd2R2FreNgYA";
+  mapboxgl.accessToken = "REPLACE THIS TOKEN WITH YOUR OWN MAPBOX ACCESS TOKEN";
 
   const cities = JSON.parse(document.getElementById("cities-data").textContent);
   const userCity = "{{ user_city }}";
