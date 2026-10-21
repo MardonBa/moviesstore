@@ -15,4 +15,22 @@
     </div>
   </div>
 </div>
+{% if user.is_authenticated %}
+  {% if profile.location_chosen %}
+    <a href="{% url 'home.map' %}" class="btn btn-primary">View Trending Map</a>
+  {% else %}
+    <form method="post" action="" class="d-flex gap-2">
+      {% csrf_token %}
+      <select name="location" class="form-control w-auto">
+        {% for value, label in location_choices %}
+          <option value="{{ value }}" {% if value == 'Atlanta' %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary"
+              onclick="return confirm('You can only choose once. Continue?')">
+        Confirm location (one time)
+      </button>
+    </form>
+  {% endif %}
+{% endif %}
 {% endblock content %}

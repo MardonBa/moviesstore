@@ -29,7 +29,10 @@ def show(request, id):
     for review in template_data['reviews']:
         numerator += review.rating
         denomenator += 5
-    template_data['averageRating'] = int(numerator / denomenator * 5 + 0.5)
+    if denomenator > 0:
+        template_data['averageRating'] = int(numerator / denomenator * 5 + 0.5)
+    else:
+        template_data['averageRating'] = 0
     return render(request, 'movies/show.html', {'template_data': template_data})
 
 @login_required
